@@ -159,42 +159,46 @@ function es2file($es_url, $output, $data_type, $verbose_mode = 1, $chunk_size = 
 
         while (true) {
             $docs_ret = $es->getScrollData($scroll_id);
-            if (isset($docs_ret->hits->hits)) {
-                $docs = $docs_ret->hits->hits;
-            } else {
-                echo "[" . date('c') . "] Get Scroll docs error: \n";
-                print_r($docs_ret);
-                echo "\n";
-                return null;
-            }
-            $count_docs += count($docs);
+			if($docs_ret != null) {
+	            if (isset($docs_ret->hits->hits)) {
+	                $docs = $docs_ret->hits->hits;
+	            } else {
+	                echo "[" . date('c') . "] Get Scroll docs error: \n";
+	                print_r($docs_ret);
+	                echo "\n";
+	                return null;
+	            }
+	            $count_docs += count($docs);
 
-            if ($verbose_mode > 1)
-                echo "[" . date('c') . "] Scroll docs: " . count($docs) . ", ($count_docs/$total_docs)\n";
+	            if ($verbose_mode > 1)
+	                echo "[" . date('c') . "] Scroll docs: " . count($docs) . ", ($count_docs/$total_docs)\n";
 
-            if (count($docs) == 0) {
-                if ($verbose_mode > 1)
-                    echo "[" . date('c') . "] Dump Result: $count_docs docs\n";
-                return 0;
-            }
+	            if (count($docs) == 0) {
+	                if ($verbose_mode > 1)
+	                    echo "[" . date('c') . "] Dump Result: $count_docs docs\n";
+	                return 0;
+	            }
 
-            foreach ($docs as $r => $row) {
-                if ($verbose_mode == 3)
-                    echo "[" . date('c') . "] Read doc: $row->_id\n";
-                if ($verbose_mode == 1)
-                    show_status($count_docs, $total_docs, $size = 40);
-                $bk_object = createBackupDocObj($row, "");
-                $dump .= $bk_object;
-                $chuck_counter++;
-            }
+	            foreach ($docs as $r => $row) {
+	                if ($verbose_mode == 3)
+	                    echo "[" . date('c') . "] Read doc: $row->_id\n";
+	                if ($verbose_mode == 1)
+	                    show_status($count_docs, $total_docs, $size = 40);
+	                $bk_object = createBackupDocObj($row, "");
+	                $dump .= $bk_object;
+	                $chuck_counter++;
+	            }
 
-            if ($chuck_counter > $chunk_size) {
-                appendDataToFile($dump, $output);
-                if ($verbose_mode > 1)
-                    echo "[" . date('c') . "] Save docs to dump file: saved $chuck_counter docs\n";
-                $chuck_counter = 0;
-                $dump = "";
-            }
+	            if ($chuck_counter > $chunk_size) {
+	                appendDataToFile($dump, $output);
+	                if ($verbose_mode > 1)
+	                    echo "[" . date('c') . "] Save docs to dump file: saved $chuck_counter docs\n";
+	                $chuck_counter = 0;
+	                $dump = "";
+	            }
+			} else {
+				return;
+			}
         }
     }
 }
@@ -323,10 +327,15 @@ class ElasticSearch
             if(!$include_index) {
                 $url_server = parse_url($this->server);
                 $server = str_replace($url_server['path'], "", $this->server);
-                return json_decode(file_get_contents($server . '/' . $path, NULL, stream_context_create(array('http' => $http))));
             } else {
-                return json_decode(file_get_contents($this->server . '/' . $path, NULL, stream_context_create(array('http' => $http))));
+				$server = $this->server;
             }
+			$response = @file_get_contents($server . '/' . $path, NULL, stream_context_create(array('http' => $http)));
+			if($response === false) {
+				return null;
+			} else {
+				return json_decode($response);
+			}
         } catch (Exception $e) {
             echo "[" . date('c') . "] ElasticSearch Class Exception: " . $e->getMessage() . "\n";
             return null;

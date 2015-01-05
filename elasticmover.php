@@ -115,9 +115,6 @@ if($argc == 1) {
 	}
 }
 
-//dumpIndex($index, $file);
-
-
 /**
  * @param $es_url
  * @param $output
@@ -128,15 +125,16 @@ if($argc == 1) {
  */
 function es2file($es_url, $output, $data_type, $verbose_mode = 1, $chunk_size = 1000)
 {
-    //TODO: dump index map
     if($data_type == 1) {
+		//Index map
         $es = new ElasticSearch($es_url);
         $map = $es->getMapping();
         $es_url_parsed = parse_url($es_url);
         $index = str_replace("/","", $es_url_parsed['path']);
-        appendDataToDumpFile(json_encode($map->{$index}), $output);
+        writeDataToFile(json_encode($map->{$index}), $output);
         echo "$index map saved\n";
     } else {
+		//Index data
         $count_docs = 0;
         $chuck_counter = 0;
         $dump = "";
@@ -191,7 +189,7 @@ function es2file($es_url, $output, $data_type, $verbose_mode = 1, $chunk_size = 
             }
 
             if ($chuck_counter > $chunk_size) {
-                appendDataToDumpFile($dump, $output);
+                appendDataToFile($dump, $output);
                 if ($verbose_mode > 1)
                     echo "[" . date('c') . "] Save docs to dump file: saved $chuck_counter docs\n";
                 $chuck_counter = 0;
@@ -280,14 +278,22 @@ function es2es($index, $file)
 function createBackupDocObj($object)
 {
     $data = "";
-    $data .= '{ "index" : { "_index" : "' . $object->_index . '", "_type" : "' . $object->_type . '" } }' . "\n";
+    $data .= '{ "index" : { "_index" : "' . $object->_index . '", "_type" : "' . $object->_type . '", "_id" : "' . $object->_id . '" } }' . "\n";
     $data .= json_encode($object->_source) . "\n";
     return $data;
 }
 
-function appendDataToDumpFile($data, $file)
+function appendDataToFile($data, $file)
 {
     $fh = fopen($file, 'a') or die("can't open file");
+    fwrite($fh, $data);
+    fclose($fh);
+}
+
+
+function writeDataToFile($data, $file)
+{
+    $fh = fopen($file, 'w') or die("can't open file");
     fwrite($fh, $data);
     fclose($fh);
 }

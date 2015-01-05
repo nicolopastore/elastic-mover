@@ -197,6 +197,13 @@ function es2file($es_url, $output, $data_type, $verbose_mode = 1, $chunk_size = 
 	                $dump = "";
 	            }
 			} else {
+				if ($dump != "") {
+					appendDataToFile($dump, $output);
+					if ($verbose_mode > 1)
+						echo "[" . date('c') . "] Save docs to dump file: saved $chuck_counter docs\n";
+					$chuck_counter = 0;
+					$dump = "";
+				}
 				return;
 			}
         }

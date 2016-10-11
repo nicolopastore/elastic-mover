@@ -11,108 +11,108 @@ $verbose_mode = 1;
 $data_type = 0;
 
 if($argc == 1) {
-	echo "ElasticMover 0.1.0\n";
-	echo "Usage: php elasticmover.php -i=<input path> -o=<output path> [options...]\n";
-	echo "Options: \n";
-	echo " -i=<elasticsearch index url or file path>\texample: -i=http://localhost:9200/index or /path/to/file\n";
-	echo " -o=<elasticsearch index url or file path>\texample: -o=http://localhost:9200/index or /path/to/file\n";
+    echo "ElasticMover 0.1.1\n";
+    echo "Usage: php elasticmover.php -i=<input path> -o=<output path> [options...]\n";
+    echo "Options: \n";
+    echo " -i=<elasticsearch index url or file path>\texample: -i=http://localhost:9200/index or /path/to/file\n";
+    echo " -o=<elasticsearch index url or file path>\texample: -o=http://localhost:9200/index or /path/to/file\n";
 } else {
-	foreach ( $argv as $key => $value ) {
-	    $arg = explode("=", $value);
-	    if (count($arg) == 2) {
-	        switch ($arg[0]) {
-	            case "-i":
-	                $i_url_parse = parse_url($arg[1]);
-	                if($i_url_parse) {
-	                    if($i_url_parse['path'] != "") {
-	                        if ($i_url_parse['scheme'] == "" && $i_url_parse['host'] == "") {
-	                            $input = $arg[1];
-	                            $input_type = 1; // file input type
-	                        } else {
-	                            $path_explode = explode("/", $i_url_parse['path']);
-	                            if (count($path_explode) == 2) {
-	                                if ($path_explode[0] == "" && $path_explode[1] != "") {
-	                                    $input = $arg[1];
-	                                    $input_type = 0; // url input type
-	                                } else {
-	                                    echo "Malformed input url, please use this format: {protocol}://{host}:{port}/{index}\n";
-	                                }
-	                            }
-	                        }
-	                    } else {
-	                        echo "Input argument error\n";
-	                    }
-	                }
-	                break;
-	            case "-o":
-	                $o_url_parse = parse_url($arg[1]);
-	                if($o_url_parse) {
-	                    if($o_url_parse['path'] != "") {
-	                        if ($o_url_parse['scheme'] == "" && $o_url_parse['host'] == "") {
-	                            $output = $arg[1];
-	                            $output_type = 1; // file input type
-	                        } else {
-	                            $path_explode = explode("/", $o_url_parse['path']);
-	                            if (count($path_explode) == 2) {
-	                                if ($path_explode[0] == "" && $path_explode[1] != "") {
-	                                    $output = $arg[1];
-	                                    $output_type = 0; // url input type
-	                                } else {
-	                                    echo "Malformed output url, please use this format: {protocol}://{host}:{port}/{index}\n";
-	                                }
-	                            }
-	                        }
-	                    } else {
-	                        echo "Output argument error\n";
-	                    }
-	                }
-	                break;
-	            case "-c":
-	                if(is_numeric($arg[1]) && $arg[1] > 0) {
-	                    $chunk_size = $arg[1];
-	                }
-	                break;
-	            case "-b":
-	                if(is_numeric($arg[1]) && $arg[1] > 0) {
-	                    $bulk_size = $arg[1];
-	                }
-	                break;
-	        }
-	    } else {
-	        switch ($value) {
-	            case "-v":
-	                $verbose_mode = 2;
-	                break;
-	            case "-vv":
-	                $verbose_mode = 3;
-	                break;
-	            case "-d":
-	                $data_type = 0;
-	                break;
-	            case "-m":
-	                $data_type = 1;
-	                break;
-	        }
-	    }
-	}
-	
-	if($input != "" && $output != "") {
-	    if($input_type == 0 && $output_type == 1) {
-	        echo "$input ---";
-	        echo $data_type ? 'map' : 'data';
-	        echo "---> $output\n";
-	        es2file($input, $output, $data_type, $verbose_mode, $chunk_size);
-	    } elseif($input_type == 1 && $output_type == 0) {
-	        echo "$input ---";
-	        echo $data_type ? 'map' : 'data';
-	        echo "---> $output\n";
-	        file2es($input, $output, $data_type, $verbose_mode, $bulk_size);
-	    } elseif($input_type == 0 && $output_type == 0) {
-	        echo "File to File transfer is not supported\n";
-	    }
-	} else {
-	    echo "Input or Output source is not specified\n";
-	}
+    foreach ( $argv as $key => $value ) {
+        $arg = explode("=", $value);
+        if (count($arg) == 2) {
+            switch ($arg[0]) {
+                case "-i":
+                    $i_url_parse = parse_url($arg[1]);
+                    if($i_url_parse) {
+                        if($i_url_parse['path'] != "") {
+                            if ($i_url_parse['scheme'] == "" && $i_url_parse['host'] == "") {
+                                $input = $arg[1];
+                                $input_type = 1; // file input type
+                            } else {
+                                $path_explode = explode("/", $i_url_parse['path']);
+                                if (count($path_explode) == 2) {
+                                    if ($path_explode[0] == "" && $path_explode[1] != "") {
+                                        $input = $arg[1];
+                                        $input_type = 0; // url input type
+                                    } else {
+                                        echo "Malformed input url, please use this format: {protocol}://{host}:{port}/{index}\n";
+                                    }
+                                }
+                            }
+                        } else {
+                            echo "Input argument error\n";
+                        }
+                    }
+                    break;
+                case "-o":
+                    $o_url_parse = parse_url($arg[1]);
+                    if($o_url_parse) {
+                        if($o_url_parse['path'] != "") {
+                            if ($o_url_parse['scheme'] == "" && $o_url_parse['host'] == "") {
+                                $output = $arg[1];
+                                $output_type = 1; // file input type
+                            } else {
+                                $path_explode = explode("/", $o_url_parse['path']);
+                                if (count($path_explode) == 2) {
+                                    if ($path_explode[0] == "" && $path_explode[1] != "") {
+                                        $output = $arg[1];
+                                        $output_type = 0; // url input type
+                                    } else {
+                                        echo "Malformed output url, please use this format: {protocol}://{host}:{port}/{index}\n";
+                                    }
+                                }
+                            }
+                        } else {
+                            echo "Output argument error\n";
+                        }
+                    }
+                    break;
+                case "-c":
+                    if(is_numeric($arg[1]) && $arg[1] > 0) {
+                        $chunk_size = $arg[1];
+                    }
+                    break;
+                case "-b":
+                    if(is_numeric($arg[1]) && $arg[1] > 0) {
+                        $bulk_size = $arg[1];
+                    }
+                    break;
+            }
+        } else {
+            switch ($value) {
+                case "-v":
+                    $verbose_mode = 2;
+                    break;
+                case "-vv":
+                    $verbose_mode = 3;
+                    break;
+                case "-d":
+                    $data_type = 0;
+                    break;
+                case "-m":
+                    $data_type = 1;
+                    break;
+            }
+        }
+    }
+
+    if($input != "" && $output != "") {
+        if($input_type == 0 && $output_type == 1) {
+            echo "$input ---";
+            echo $data_type ? 'map' : 'data';
+            echo "---> $output\n";
+            es2file($input, $output, $data_type, $verbose_mode, $chunk_size);
+        } elseif($input_type == 1 && $output_type == 0) {
+            echo "$input ---";
+            echo $data_type ? 'map' : 'data';
+            echo "---> $output\n";
+            file2es($input, $output, $data_type, $verbose_mode, $bulk_size);
+        } elseif($input_type == 0 && $output_type == 0) {
+            echo "File to File transfer is not supported\n";
+        }
+    } else {
+        echo "Input or Output source is not specified\n";
+    }
 }
 
 /**
@@ -126,7 +126,7 @@ if($argc == 1) {
 function es2file($es_url, $output, $data_type, $verbose_mode = 1, $chunk_size = 1000)
 {
     if($data_type == 1) {
-		//Index map
+        //Index map
         $es = new ElasticSearch($es_url);
         $map = $es->getMapping();
         $es_url_parsed = parse_url($es_url);
@@ -134,7 +134,7 @@ function es2file($es_url, $output, $data_type, $verbose_mode = 1, $chunk_size = 
         writeDataToFile(json_encode($map->{$index}), $output);
         echo "$index map saved\n";
     } else {
-		//Index data
+        //Index data
         $count_docs = 0;
         $chuck_counter = 0;
         $dump = "";
@@ -159,53 +159,53 @@ function es2file($es_url, $output, $data_type, $verbose_mode = 1, $chunk_size = 
 
         while (true) {
             $docs_ret = $es->getScrollData($scroll_id);
-			if($docs_ret != null) {
-	            if (isset($docs_ret->hits->hits)) {
-	                $docs = $docs_ret->hits->hits;
-	            } else {
-	                echo "[" . date('c') . "] Get Scroll docs error: \n";
-	                print_r($docs_ret);
-	                echo "\n";
-	                return null;
-	            }
-	            $count_docs += count($docs);
+            if($docs_ret != null) {
+                if (isset($docs_ret->hits->hits)) {
+                    $docs = $docs_ret->hits->hits;
+                } else {
+                    echo "[" . date('c') . "] Get Scroll docs error: \n";
+                    print_r($docs_ret);
+                    echo "\n";
+                    return null;
+                }
+                $count_docs += count($docs);
 
-	            if ($verbose_mode > 1)
-	                echo "[" . date('c') . "] Scroll docs: " . count($docs) . ", ($count_docs/$total_docs)\n";
+                if ($verbose_mode > 1)
+                    echo "[" . date('c') . "] Scroll docs: " . count($docs) . ", ($count_docs/$total_docs)\n";
 
-	            if (count($docs) == 0) {
-	                if ($verbose_mode > 1)
-	                    echo "[" . date('c') . "] Dump Result: $count_docs docs\n";
-	                return 0;
-	            }
+                if (count($docs) == 0) {
+                    if ($verbose_mode > 1)
+                        echo "[" . date('c') . "] Dump Result: $count_docs docs\n";
+                    return 0;
+                }
 
-	            foreach ($docs as $r => $row) {
-	                if ($verbose_mode == 3)
-	                    echo "[" . date('c') . "] Read doc: $row->_id\n";
-	                if ($verbose_mode == 1)
-	                    show_status($count_docs, $total_docs, $size = 40);
-	                $bk_object = createBackupDocObj($row, "");
-	                $dump .= $bk_object;
-	                $chuck_counter++;
-	            }
+                foreach ($docs as $r => $row) {
+                    if ($verbose_mode == 3)
+                        echo "[" . date('c') . "] Read doc: $row->_id\n";
+                    if ($verbose_mode == 1)
+                        show_status($count_docs, $total_docs, $size = 40);
+                    $bk_object = createBackupDocObj($row, "");
+                    $dump .= $bk_object;
+                    $chuck_counter++;
+                }
 
-	            if ($chuck_counter > $chunk_size) {
-	                appendDataToFile($dump, $output);
-	                if ($verbose_mode > 1)
-	                    echo "[" . date('c') . "] Save docs to dump file: saved $chuck_counter docs\n";
-	                $chuck_counter = 0;
-	                $dump = "";
-	            }
-			} else {
-				if ($dump != "") {
-					appendDataToFile($dump, $output);
-					if ($verbose_mode > 1)
-						echo "[" . date('c') . "] Save docs to dump file: saved $chuck_counter docs\n";
-					$chuck_counter = 0;
-					$dump = "";
-				}
-				return;
-			}
+                if ($chuck_counter > $chunk_size) {
+                    appendDataToFile($dump, $output);
+                    if ($verbose_mode > 1)
+                        echo "[" . date('c') . "] Save docs to dump file: saved $chuck_counter docs\n";
+                    $chuck_counter = 0;
+                    $dump = "";
+                }
+            } else {
+                if ($dump != "") {
+                    appendDataToFile($dump, $output);
+                    if ($verbose_mode > 1)
+                        echo "[" . date('c') . "] Save docs to dump file: saved $chuck_counter docs\n";
+                    $chuck_counter = 0;
+                    $dump = "";
+                }
+                return;
+            }
         }
     }
 }
@@ -225,6 +225,7 @@ function file2es($input, $es_url, $data_type, $verbose_mode = 1, $bulk_size = 10
 {
     if($data_type == 1) {
         // Index Map
+    echo "[" . date('c') . "] Reading map file\n";
         $handle = fopen($input, "rb");
         $contents = fread($handle, filesize($input));
         fclose($handle);
@@ -242,7 +243,9 @@ function file2es($input, $es_url, $data_type, $verbose_mode = 1, $bulk_size = 10
         $total_line_count = 0;
         $line_count = 0;
         $bulk_count = 0;
+    $obj_count = 0;
 
+    echo "[" . date('c') . "] Reading data file\n";
         $handle = fopen($input, "r");
         while(!feof($handle)){
             fgets($handle);
@@ -250,26 +253,40 @@ function file2es($input, $es_url, $data_type, $verbose_mode = 1, $bulk_size = 10
         }
         fclose($handle);
 
+    echo "[" . date('c') . "] Starting data import\n";
+    $obj_buffer = "";
         $data = "";
         $handle = fopen($input, "r");
         while (!feof($handle)) {
             $line = fgets($handle);
-            $data .= $line;
+            if (strpos($line, '_index') !== false) {
+                $obj_buffer = $line;
+            } else {
+                $obj_buffer .= $line;
+                $data .= $obj_buffer;
+        $obj_count++;
+        $obj_buffer = "";
+            }
+
             $bulk_count++;
             $line_count++;
 
-            if($bulk_count >= $bulk_size)
-            {
-                $es = new ElasticSearch($es_url);
-                $res = $es->bulk($data);
-
-                show_status($line_count/2, $total_line_count/2, $size = 40);
-                $bulk_count = 0;
-                $data = "";
-                sleep(2);
-            }
+        if(bulkData($es_url, $data, $bulk_count, $bulk_size)) {
+        $bulk_count = 0;
+        $data = "";
+        show_status($line_count, $total_line_count);
         }
+        }
+
+        if(bulkData($es_url, $data, $bulk_count, 0)) {
+            $bulk_count = 0;
+            $data = "";
+        show_status($line_count, $total_line_count);
+        }
+
         fclose($handle);
+    echo "\n";
+    echo "[" . date('c') . "] Imported $obj_count docs\n";
     }
 }
 
@@ -301,6 +318,17 @@ function appendDataToFile($data, $file)
     fclose($fh);
 }
 
+function bulkData($es_url, $data, $count, $limit)
+{
+    if($count >= $limit)
+    {
+        $es = new ElasticSearch($es_url);
+        $res = $es->bulk($data);
+        sleep(2);
+    return true;
+     }
+     return false;
+}
 
 function writeDataToFile($data, $file)
 {
@@ -335,14 +363,14 @@ class ElasticSearch
                 $url_server = parse_url($this->server);
                 $server = str_replace($url_server['path'], "", $this->server);
             } else {
-				$server = $this->server;
+                $server = $this->server;
             }
-			$response = @file_get_contents($server . '/' . $path, NULL, stream_context_create(array('http' => $http)));
-			if($response === false) {
-				return null;
-			} else {
-				return json_decode($response);
-			}
+            $response = @file_get_contents($server . '/' . $path, NULL, stream_context_create(array('http' => $http)));
+            if($response === false) {
+                return null;
+            } else {
+                return json_decode($response);
+            }
         } catch (Exception $e) {
             echo "[" . date('c') . "] ElasticSearch Class Exception: " . $e->getMessage() . "\n";
             return null;
@@ -409,7 +437,7 @@ class ElasticSearch
  * @param $total
  * @param int $size
  */
-function show_status($done, $total, $size=30)
+function show_status($done, $total, $size=50)
 {
     static $start_time;
     // if we go over our bound, just ignore it

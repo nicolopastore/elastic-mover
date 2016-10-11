@@ -6,7 +6,7 @@ An easy-to-use, single-file, PHP CLI script tool for dump, restore, save, import
 ### Usage
 
 ```sh
-php elasticmover.php -i=<INPUT PATH> -O=<OUTPUT PATH> [options...]
+php elasticmover.php -i=<INPUT PATH> -o=<OUTPUT PATH> [options...]
 ```
 INPUT PATH and OUTPUT PATH can be:
 - elasticsearch index url: `{protocol}://{host}:{port}/{index}`
